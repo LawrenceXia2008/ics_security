@@ -1,0 +1,15 @@
+{
+"settings_file": "",
+"sample_size": 100,
+"input_win": 20,
+"predict_win": 100,
+"step": 100,
+"frame_size":20,
+"sensor_id0": 1,
+"sensor_ide": 51,
+"test_norm_with_train": false,
+"hidden_units": 100,
+"learning_rate":0.1,
+"batch_size": 32,
+"nb_epochs": 50
+}
