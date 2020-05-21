@@ -12,21 +12,19 @@ import tensorflow as tf
 # import pandas as pd
 from sklearn import metrics
 
-# from keras.models import load_model
-import conditional_test_add_pure_merge_interval_try
-
 from keras.models import load_model
 import re
 import pdb
 
-# GPU Limitation
+# My Implementation
+import models
+import conditional_test_add_pure_merge_interval_try
+
+'''GPU Limitation'''
 from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto()
 config.gpu_options.per_process_gpu_memory_fraction = 0.3
 set_session(tf.Session(config=config))
-
-# My Implementation
-import models
 
 
 '''function'''
@@ -138,7 +136,7 @@ def one_model_operation_unconditional(model,model_path,params, train_input, trai
             _,_,_,_, train_input, train_predict, test_input, test_predict = get_settings_and_files()
     # with model_graph.as_default():
     #     with model_session.as_default():
-            print('********************  开始预测第一个  ********************')
+            print('********************  开始预测  ********************')
             train_predict_NN, train_rcstr_NN, train_predict_true, train_rcstr_true = NN_predict(model,train_input,train_predict)
             test_predict_NN, test_rcstr_NN, test_predict_true, test_rcstr_true = NN_predict(model, test_input, test_predict)
             print('********************  已经全都预测完  ********************')
@@ -171,7 +169,7 @@ def test_in_one_model(models_path, fuse):
     # print('######test_rcstr_true.shape######',test_rcstr_true.shape)
 
 
-    '''预测+重构'''
+    '''预测+重构融合方式'''
     if fuse == 'A':
         alpha = params['rcstr_weight']
         beta = params['predict_weight']
@@ -212,12 +210,12 @@ def test_in_one_model(models_path, fuse):
     # end_t1 = '2017-10-11 06:00:00 PM'
 
     '''单点'''
-    weight_or_not = True
+    weight_or_not = False
     test_obj = conditional_test_add_pure_merge_interval_try.analysis(train_rcstr_true, train_rcstr_NN, test_rcstr_true, test_rcstr_NN, train_predict_true, train_predict_NN, test_predict_true, test_predict_NN,
      ground_truth, start_t1, end_t1, input_win, weight_or_not=weight_or_not,
                                                   weight_type=1,
                                                   norm_or_not=False,rcstr_weight=params['rcstr_weight'],predict_weight=params['predict_weight'],
-                                                  fuse = 'A', specific="1221")  # 这里的False指的是是否使用归一化误差
+                                                  fuse=fuse, specific="1221")  # 这里的False指的是是否使用归一化误差
     
     max_wgt_error_value=np.max(test_obj.wgt_error_out_ewma if weight_or_not==True else test_obj.nwgt_error_out_ewma)
     near_max_wgt_error_value=np.percentile(test_obj.wgt_error_out_ewma if weight_or_not==True else test_obj.nwgt_error_out_ewma,99.9)
@@ -331,6 +329,6 @@ if __name__ == '__main__':
             -- 'reconstruct' 只使用重构
     '''
     model_path="../resultdata/05_16_21_39conditional训练结果(conditional版本)/模型/05_16_21_39model-ep148-loss0.31598-val_loss0.17372.h5"
-    test_in_one_model(models_path = model_path, fuse = 'C')
+    test_in_one_model(models_path = model_path, fuse = 'predict')
 
 
